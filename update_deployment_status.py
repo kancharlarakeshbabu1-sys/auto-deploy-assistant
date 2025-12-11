@@ -11,19 +11,22 @@ from datetime import datetime
 
 def find_deployment_record(table, commit_sha, max_attempts=6, wait_seconds=10):
     """
-    Find the deployment record, with retries to wait for Zapier
+    Find the deployment record by timestamp (most recent within last 2 minutes)
     
     Args:
         table: Airtable table object
-        commit_sha: Commit SHA to match
+        commit_sha: Commit SHA (for logging only)
         max_attempts: Number of retry attempts
         wait_seconds: Seconds to wait between attempts
     """
     
+    from datetime import datetime, timedelta
+    import time
+    
     short_sha = commit_sha[:7]
     
     for attempt in range(1, max_attempts + 1):
-        print(f"Attempt {attempt}/{max_attempts}: Looking for commit {short_sha}...")
+        print(f"Attempt {attempt}/{max_attempts}: Looking for recent deployment...")
         
         # Get all records
         all_records = table.all()
@@ -43,25 +46,26 @@ def find_deployment_record(table, commit_sha, max_attempts=6, wait_seconds=10):
             reverse=True
         )
         
-        # Look for matching SHA in recent records
-        for record in sorted_records[:10]:  # Check last 10 records
-            fields = record['fields']
-            record_sha = fields.get('Commit SHA', '')
-            
-            # Match full SHA or short SHA
-            if record_sha == commit_sha or record_sha == short_sha or commit_sha.startswith(record_sha):
-                print(f"  Found matching record: {record['id']}")
-                print(f"  Commit SHA in Airtable: {record_sha}")
-                return record
+        # Get the most recent record (created in last 2 minutes)
+        most_recent = sorted_records[0]
+        created_time = datetime.fromisoformat(most_recent['createdTime'].replace('Z', '+00:00'))
+        now = datetime.now(created_time.tzinfo)
+        age_seconds = (now - created_time).total_seconds()
         
-        # No match found, wait and retry
+        print(f"  Most recent record age: {age_seconds:.1f} seconds")
+        print(f"  Record ID: {most_recent['id']}")
+        
+        # If record is less than 2 minutes old, it's probably ours
+        if age_seconds < 120:
+            print(f"  Found recent record (created {age_seconds:.1f}s ago)")
+            return most_recent
+        
+        # Wait and retry
         if attempt < max_attempts:
-            print(f"  No matching record found yet")
-            print(f"  Most recent commit SHA in Airtable: {sorted_records[0]['fields'].get('Commit SHA', 'none')}")
-            print(f"  Waiting {wait_seconds} seconds for Zapier...")
+            print(f"  No recent record found, waiting {wait_seconds} seconds...")
             time.sleep(wait_seconds)
     
-    print("WARNING: Could not find matching record after all attempts")
+    print("WARNING: Could not find recent deployment record")
     return None
 
 
