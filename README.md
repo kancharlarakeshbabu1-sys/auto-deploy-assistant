@@ -23,9 +23,9 @@ An intelligent AI-powered deployment tracking system that:
 - Python 3.8+
 - Git
 
-## Quick Setup (30 Minutes)
+## Quick Setup
 
-### Step 1: Clone and Setup Repository (5 min)
+### Step 1: Clone and Setup Repository
 
 ```bash
 # Create new repository or use existing one
@@ -42,7 +42,7 @@ cp path/to/github-workflow-deploy.yml .github/workflows/deploy.yml
 pip install flask openai  # or: pip install anthropic
 ```
 
-### Step 2: Setup Airtable (10 min)
+### Step 2: Setup Airtable
 
 1. **Create Base**: "Deployment Tracker"
 2. **Table 1: Deployments**
@@ -65,7 +65,7 @@ pip install flask openai  # or: pip install anthropic
    - Table IDs: Found in table URL
    - API Key: From account settings
 
-### Step 3: Configure GitHub Actions (5 min)
+### Step 3: Configure GitHub Actions
 
 1. Add GitHub Secrets:
    - `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`
@@ -79,7 +79,7 @@ git push
 
 3. Enable GitHub Actions in repository settings
 
-### Step 4: Setup Zapier Workflow (10 min)
+### Step 4: Setup Zapier Workflow
 
 **Create Zap: GitHub → Airtable → Notifications**
 
