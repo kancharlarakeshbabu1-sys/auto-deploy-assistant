@@ -32,7 +32,7 @@ jobs:
     
     - name: Run tests
       run: |
-        echo "Running tests..."
+        python test_fail.py
     
     - name: Build application
       run: |
