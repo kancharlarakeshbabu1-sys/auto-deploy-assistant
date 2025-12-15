@@ -11,7 +11,7 @@ from datetime import datetime
 
 def find_deployment_record(table, commit_sha, max_attempts=6, wait_seconds=10):
     """
-    Find the deployment record by timestamp (most recent within last 2 minutes)
+    Find the deployment record by timestamp (most recent within last 5 minutes)
     
     Args:
         table: Airtable table object
@@ -55,8 +55,8 @@ def find_deployment_record(table, commit_sha, max_attempts=6, wait_seconds=10):
         print(f"  Most recent record age: {age_seconds:.1f} seconds")
         print(f"  Record ID: {most_recent['id']}")
         
-        # If record is less than 2 minutes old, it's probably ours
-        if age_seconds < 120:
+        # If record is less than 5 minutes old, it's probably ours
+        if age_seconds < 300:  
             print(f"  Found recent record (created {age_seconds:.1f}s ago)")
             return most_recent
         
